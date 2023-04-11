@@ -18,7 +18,6 @@ from hazm import *
 import collections
 from wordcloud_fa import WordCloudFa
 import numpy as np
-
 app = Flask(__name__)
 CORS(app, support_credentials=True)
 
@@ -58,45 +57,35 @@ def getWordCloud():
     
 @app.route('/informationExtraction',methods=['POST'])
 def informationExtraction():
-    text = request.form.get('text')
-    normalizer = Normalizer()
-    text = normalizer.normalize(text)
-    words = word_tokenize(text)
-    stemmer = Stemmer()
-    stemmed_words = [stemmer.stem(word) for word in words]
-    # Tagging the words
-    tagger = POSTagger(model='resources/postagger.model')
-    tags = tagger.tag(words)
-
-    # Extracting named entities
-    chunker = Chunker(model='resources/chunker.model')
-    tree2brackets = TreebankReader().tree2brackets
-    brackets2str = BracketParseCorpusReader().bracket2str
-    chunks = chunker.chunk(tagged_sentence=tags)
-    brackets = tree2brackets(chunks)
-    entities = brackets2str(brackets)
-
-    # Displaying the extracted information
-    # print("Words: ", words)
-    # print("Stemmed words: ", stemmed_words)
-    # print("POS tags: ", tags)
-    # print("Named entities: ", entities)
-    return jsonify(entities)
-
+      text = request.form.get('text')
+      normalizer = Normalizer()
+      text = normalizer.normalize(text)
+      words = word_tokenize(text)
+      stemmer = Stemmer()
+      stemmed_words = [stemmer.stem(word) for word in words]
+      # Tagging the words
+      tagger = POSTagger(model='resources/postagger.model')
+      tags = tagger.tag(words)
+      # Extracting named entities
+      chunker = Chunker(model='resources/chunker.model')
+      tree2brackets = TreebankReader().tree2brackets
+      brackets2str = BracketParseCorpusReader().bracket2str
+      chunks = chunker.chunk(tagged_sentence=tags)
+      brackets = tree2brackets(chunks)
+      entities = brackets2str(brackets)
+      return jsonify(entities)
+    #   Displaying the extracted information
+    #   print("Words: ", words)
+    #   print("Stemmed words: ", stemmed_words)
+    #   print("POS tags: ", tags)
+    #   print("Named entities: ", entities)
 
 # Output:
-
-
 # Words:  ['من', 'به', 'دانشگاه', 'تهران', 'رفتم', 'و', 'در', 'رشته', 'مهندسی', 'کامپیوتر', 'تحصیل', 'کردم', '.']
 # Stemmed words:  ['من', 'به', 'دانشگاه', 'تهران', 'رفت', 'و', 'در', 'رشته', 'مهندسی', 'کامپیوتر', 'تحصیل', 'کرد', '.']
 # POS tags:  [('من', 'PRO'), ('به', 'P'), ('دانشگاه', 'NC'), ('تهران', 'NP'), ('رفتم', 'V'), ('و', 'CONJ'), ('در', 'P'), ('رشته', 'NC'), ('مهندسی', 'NC'), ('کامپیوتر', 'NC'), ('تحصیل', 'NC'), ('کردم', 'V'), ('.', '.')]
 # Named entities:  (PP دانشگاه تهران/NP) (PP رشته مهندسی کامپیوتر/NC)
 
-#documents = gensim.models.doc2vec.TaggedLineDocument('result2.txt')
-#loading the model
-#model_loaded = gensim.models.doc2vec.Doc2Vec.load('my_model_sents_from_res2.doc2vec')
-
-#sample Text
 if __name__ == '__main__':
     app.debug = True
     app.run()
